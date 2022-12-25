@@ -83,7 +83,8 @@ class MorfeusDescriptors:
 from rdkit import Chem
 # ammonia
 _MD = MorfeusDescriptors()
-test_smiles = "O"
+test_smiles = "N(C(=S)NCc1ccc(C(=O)c2ccc(C)cc2)cc1)C(C(C)CC)C(OC)=O"
+
 mol = Chem.MolFromSmiles(test_smiles)
 
 temp_dir, geometry_path = _MD._get_optimized_geometry_path(mol=mol)
@@ -102,7 +103,7 @@ print(xtb.get_global_descriptor("nucleophilicity", corrected=True))
 
 
 
-# add try except in case xtb fails to converge
+# todo: add try except in case xtb fails to converge
 
 
 
