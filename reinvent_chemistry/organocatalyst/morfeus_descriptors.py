@@ -80,30 +80,5 @@ class MorfeusDescriptors:
         shutil.rmtree(path)
 
 
-from rdkit import Chem
-# ammonia
-_MD = MorfeusDescriptors()
-test_smiles = "N(C(=S)NCc1ccc(C(=O)c2ccc(C)cc2)cc1)C(C(C)CC)C(OC)=O"
-
-mol = Chem.MolFromSmiles(test_smiles)
-
-temp_dir, geometry_path = _MD._get_optimized_geometry_path(mol=mol)
-elements, coordinates = read_xyz(geometry_path)
-xtb = XTB(elements, coordinates)
-shutil.rmtree(temp_dir)
-
-print(xtb.get_ip(corrected=True))
-print(xtb.get_ea(corrected=True))
-print(xtb.get_homo())
-print(xtb.get_lumo())
-dipoles = xtb.get_dipole()
-print(np.sqrt(np.array(dipoles).dot(np.array(dipoles).T)))
-print(xtb.get_global_descriptor("electrophilicity", corrected=True))
-print(xtb.get_global_descriptor("nucleophilicity", corrected=True))
-
-
-
-# todo: add try except in case xtb fails to converge
-
 
 
