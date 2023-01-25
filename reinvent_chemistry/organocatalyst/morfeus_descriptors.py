@@ -2,6 +2,7 @@ import os
 import shutil
 
 import numpy as np
+import math
 
 from rdkit.Chem import Mol
 from reinvent_chemistry.organocatalyst.geometry_optimizer import GeometryOptimizer
@@ -16,60 +17,138 @@ class MorfeusDescriptors:
 
     def ionization_potential(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
-        elements, coordinates = read_xyz(geometry_path)
-        xtb = XTB(elements, coordinates)
-        self._clean_up_temp_dir(path=temp_dir)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            return xtb.get_ip(corrected=True)
 
-        return xtb.get_ip(corrected=True)
+        except FileNotFoundError:
+            return 0.0
 
     def electron_affinity(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
-        elements, coordinates = read_xyz(geometry_path)
-        xtb = XTB(elements, coordinates)
-        self._clean_up_temp_dir(path=temp_dir)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            return xtb.get_ea(corrected=True)
 
-        return xtb.get_ea(corrected=True)
+        except FileNotFoundError:
+            return 0.0
 
     def homo(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
-        elements, coordinates = read_xyz(geometry_path)
-        xtb = XTB(elements, coordinates)
-        self._clean_up_temp_dir(path=temp_dir)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            return xtb.get_homo()
 
-        return xtb.get_homo()
+        except FileNotFoundError:
+            return 0.0
 
     def lumo(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
-        elements, coordinates = read_xyz(geometry_path)
-        xtb = XTB(elements, coordinates)
-        self._clean_up_temp_dir(path=temp_dir)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            return xtb.get_lumo()
 
-        return xtb.get_lumo()
+        except FileNotFoundError:
+            return 0.0
 
     def dipole(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
-        elements, coordinates = read_xyz(geometry_path)
-        xtb = XTB(elements, coordinates)
-        dipoles = xtb.get_dipole()
-        self._clean_up_temp_dir(path=temp_dir)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            dipoles = xtb.get_dipole()
+            self._clean_up_temp_dir(path=temp_dir)
+            return np.sqrt(np.array(dipoles).dot(np.array(dipoles).T))
 
-        return np.sqrt(np.array(dipoles).dot(np.array(dipoles).T))
+        except FileNotFoundError:
+            return 0.0
 
     def global_electrophilicity(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
-        elements, coordinates = read_xyz(geometry_path)
-        xtb = XTB(elements, coordinates)
-        self._clean_up_temp_dir(path=temp_dir)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            return xtb.get_global_descriptor("electrophilicity", corrected=True)
 
-        return xtb.get_global_descriptor("electrophilicity", corrected=True)
+        except FileNotFoundError:
+            return 0.0
 
     def global_nucleophilicity(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
-        elements, coordinates = read_xyz(geometry_path)
-        xtb = XTB(elements, coordinates)
-        self._clean_up_temp_dir(path=temp_dir)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            return xtb.get_global_descriptor("nucleophilicity", corrected=True)
 
-        return xtb.get_global_descriptor("nucleophilicity", corrected=True)
+        except FileNotFoundError:
+            return 0.0
+
+    def chemical_potential(self, mol: Mol) -> float:
+        temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            lumo_energy = xtb.get_lumo()
+            homo_energy = xtb.get_homo()
+            return (lumo_energy + homo_energy) / 2
+
+        except FileNotFoundError:
+            return 0.0
+
+    def hardness(self, mol: Mol) -> float:
+        temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            lumo_energy = xtb.get_lumo()
+            homo_energy = xtb.get_homo()
+            return (lumo_energy - homo_energy) / 2
+
+        except FileNotFoundError:
+            return 0.0
+
+    def electrophilicity_index(self, mol: Mol) -> float:
+        temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            lumo_energy = xtb.get_lumo()
+            homo_energy = xtb.get_homo()
+            chemical_potential = (lumo_energy + homo_energy) / 2
+            hardness = (lumo_energy - homo_energy) / 2
+            return (math.pow(chemical_potential, 2)) / (2 * hardness)
+
+        except FileNotFoundError:
+            return 0.0
+
+    def nucleophilicity_index(self, mol: Mol) -> float:
+        temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
+        try:
+            elements, coordinates = read_xyz(geometry_path)
+            xtb = XTB(elements, coordinates)
+            self._clean_up_temp_dir(path=temp_dir)
+            lumo_energy = xtb.get_lumo()
+            homo_energy = xtb.get_homo()
+            chemical_potential = (lumo_energy + homo_energy) / 2
+            hardness = (lumo_energy - homo_energy) / 2
+            E_index = (math.pow(chemical_potential, 2)) / (2 * hardness)
+            return 1 / E_index
+
+        except FileNotFoundError:
+            return 0.0
 
     def _get_optimized_geometry_path(self, mol: Mol):
         temp_dir = self._geometry_optimizer.optimize_xtb_geometry(mol=mol)
