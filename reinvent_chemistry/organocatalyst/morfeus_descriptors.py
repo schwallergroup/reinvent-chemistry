@@ -23,7 +23,7 @@ class MorfeusDescriptors:
             self._clean_up_temp_dir(path=temp_dir)
             return xtb.get_ip(corrected=True)
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def electron_affinity(self, mol: Mol) -> float:
@@ -34,7 +34,7 @@ class MorfeusDescriptors:
             self._clean_up_temp_dir(path=temp_dir)
             return xtb.get_ea(corrected=True)
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def homo(self, mol: Mol) -> float:
@@ -45,7 +45,7 @@ class MorfeusDescriptors:
             self._clean_up_temp_dir(path=temp_dir)
             return xtb.get_homo()
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def lumo(self, mol: Mol) -> float:
@@ -56,7 +56,7 @@ class MorfeusDescriptors:
             self._clean_up_temp_dir(path=temp_dir)
             return xtb.get_lumo()
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def dipole(self, mol: Mol) -> float:
@@ -68,7 +68,7 @@ class MorfeusDescriptors:
             self._clean_up_temp_dir(path=temp_dir)
             return np.sqrt(np.array(dipoles).dot(np.array(dipoles).T))
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def global_electrophilicity(self, mol: Mol) -> float:
@@ -79,7 +79,7 @@ class MorfeusDescriptors:
             self._clean_up_temp_dir(path=temp_dir)
             return xtb.get_global_descriptor("electrophilicity", corrected=True)
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def global_nucleophilicity(self, mol: Mol) -> float:
@@ -90,7 +90,7 @@ class MorfeusDescriptors:
             self._clean_up_temp_dir(path=temp_dir)
             return xtb.get_global_descriptor("nucleophilicity", corrected=True)
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def chemical_potential(self, mol: Mol) -> float:
@@ -103,7 +103,7 @@ class MorfeusDescriptors:
             homo_energy = xtb.get_homo()
             return (lumo_energy + homo_energy) / 2
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def hardness(self, mol: Mol) -> float:
@@ -116,7 +116,7 @@ class MorfeusDescriptors:
             homo_energy = xtb.get_homo()
             return (lumo_energy - homo_energy) / 2
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def electrophilicity_index(self, mol: Mol) -> float:
@@ -131,7 +131,7 @@ class MorfeusDescriptors:
             hardness = (lumo_energy - homo_energy) / 2
             return (math.pow(chemical_potential, 2)) / (2 * hardness)
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def nucleophilicity_index(self, mol: Mol) -> float:
@@ -147,7 +147,7 @@ class MorfeusDescriptors:
             E_index = (math.pow(chemical_potential, 2)) / (2 * hardness)
             return 1 / E_index
 
-        except FileNotFoundError:
+        except Exception:
             return 0.0
 
     def _get_optimized_geometry_path(self, mol: Mol):
@@ -158,6 +158,16 @@ class MorfeusDescriptors:
     def _clean_up_temp_dir(path: str):
         shutil.rmtree(path)
 
+"""
+from rdkit import Chem
+_MD = MorfeusDescriptors()
+x = Chem.MolFromSmiles('S=C(NC1=CC=CC=C1)N[C@@H]2[C@@H](N(C)C)CCCC2')
+y = Chem.MolFromSmiles('S=C(NC1=CC=CC=C1)NC2C(N(C)C)CCCC2')
 
+x_result = _MD.lumo(x)
+y_result = _MD.lumo(y)
 
+print(x_result)
+print(y_result)
+"""
 
