@@ -24,7 +24,7 @@ class MorfeusDescriptors:
             return xtb.get_ip(corrected=True)
 
         except Exception:
-            return 0.0
+            return 100
 
     def electron_affinity(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -157,17 +157,4 @@ class MorfeusDescriptors:
     @staticmethod
     def _clean_up_temp_dir(path: str):
         shutil.rmtree(path)
-
-"""
-from rdkit import Chem
-_MD = MorfeusDescriptors()
-x = Chem.MolFromSmiles('S=C(NC1=CC=CC=C1)N[C@@H]2[C@@H](N(C)C)CCCC2')
-y = Chem.MolFromSmiles('S=C(NC1=CC=CC=C1)NC2C(N(C)C)CCCC2')
-
-x_result = _MD.lumo(x)
-y_result = _MD.lumo(y)
-
-print(x_result)
-print(y_result)
-"""
 
