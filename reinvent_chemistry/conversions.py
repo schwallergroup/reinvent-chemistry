@@ -101,15 +101,16 @@ class Conversions:
         """takes a list of SMILES and returns a list of randomized SMILES"""
         randomized_smiles_list = []
         for smiles in smiles_list:
-            try:
-                randomized_smiles = self.randomize_smiles(smiles)
-                # there may be tokens in the randomized SMILES that are not in the Vocabulary
-                # check if the randomized SMILES can be encoded
-                tokens = _ST.tokenize(randomized_smiles)
-                encoded = prior.get_vocabulary().encode(tokens)
-                randomized_smiles_list.append(randomized_smiles)
-            except KeyError:
-                randomized_smiles_list.append(smiles)
+            randomized_smiles = self.randomize_smiles(smiles)
+            if randomized_smiles:
+                try:
+                    # there may be tokens in the randomized SMILES that are not in the Vocabulary
+                    # check if the randomized SMILES can be encoded
+                    tokens = _ST.tokenize(randomized_smiles)
+                    encoded = prior.get_vocabulary().encode(tokens)
+                    randomized_smiles_list.append(randomized_smiles)
+                except KeyError:
+                    randomized_smiles_list.append(smiles)
             else:
                 randomized_smiles_list.append(smiles)
 
