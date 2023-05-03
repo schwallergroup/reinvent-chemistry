@@ -7,6 +7,11 @@ from rdkit.Chem.rdmolops import RenumberAtoms
 from rdkit.DataStructs.cDataStructs import UIntSparseIntVect
 from rdkit.Chem import SDWriter
 
+from rdkit.Chem.Scaffolds.MurckoScaffold import GetScaffoldForMol
+from reinvent_models.reinvent_core.models.vocabulary import SMILESTokenizer
+
+_ST = SMILESTokenizer()
+
 
 class Conversions:
 
@@ -92,6 +97,25 @@ class Conversions:
         """
         return self.smile_to_mol(self.mol_to_smiles(molecule))
 
+    def get_randomized_smiles(self, smiles_list, prior) -> list:
+        """takes a list of SMILES and returns a list of randomized SMILES"""
+        randomized_smiles_list = []
+        for smiles in smiles_list:
+            randomized_smiles = self.randomize_smiles(smiles)
+            if randomized_smiles:
+                try:
+                    # there may be tokens in the randomized SMILES that are not in the Vocabulary
+                    # check if the randomized SMILES can be encoded
+                    tokens = _ST.tokenize(randomized_smiles)
+                    encoded = prior.get_vocabulary().encode(tokens)
+                    randomized_smiles_list.append(randomized_smiles)
+                except KeyError:
+                    randomized_smiles_list.append(smiles)
+            else:
+                randomized_smiles_list.append(smiles)
+
+        return randomized_smiles_list
+
     def randomize_smiles(self, smiles: str) -> str:
         """
         Returns a random SMILES given a SMILES of a molecule.
@@ -105,6 +129,18 @@ class Conversions:
             random.shuffle(new_atom_order)
             random_mol = RenumberAtoms(mol, newOrder=new_atom_order)
             return MolToSmiles(random_mol, canonical=False, isomericSmiles=False)
+
+    def get_scaffold(self, smiles: str):
+        """returns the Bemis-Murcko scaffold given a SMILES of a molecule."""
+        mol = MolFromSmiles(smiles)
+        if mol:
+            try:
+                scaffold = GetScaffoldForMol(mol)
+                return MolToSmiles(scaffold)
+            except Exception:
+                return ''
+        else:
+            return ''
 
     def mol_to_inchi_key(self, molecule: Mol) -> str:
         """ Returns the standard InChI key for a molecule """
