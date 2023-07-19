@@ -13,12 +13,19 @@ class Similarity:
         tanimoto = self.calculate_tanimoto(query_fps, ref_fingerprints)
         jaccard = 1 - tanimoto
         return jaccard
+
     
     def smiles_to_mol(self, smiles_strings):
+        if not isinstance(smiles_strings, list) or not all(isinstance(s, str) for s in smiles_strings):
+            raise TypeError("smiles_strings must be a list of strings")
+
         mols = [Chem.rdmolops.AddHs(Chem.MolFromSmiles(smi)) for smi in smiles_strings]
         return mols
 
     def calc_espsim(self, ref_smi, query_smis):
+        if not isinstance(ref_smi, str) or not isinstance(query_smis, list) or not all(isinstance(s, str) for s in query_smis):
+            raise TypeError("ref_smi must be a string and query_smis must be a list of strings")
+
         ref = self.smiles_to_mol([ref_smi])[0] 
         similarity_scores = []
 
