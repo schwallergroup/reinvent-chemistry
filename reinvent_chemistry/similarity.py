@@ -23,6 +23,10 @@ class Similarity:
         return mols
 
     def calc_espsim(self, ref_smi, query_smis):
+        print(f"Type of ref_smi: {type(ref_smi)}")
+        print(f"Type of query_smis: {type(query_smis)}")
+        if isinstance(query_smis, list):
+            print(f"Types inside query_smis: {[type(x) for x in query_smis]}")
         if not isinstance(ref_smi, str) or not isinstance(query_smis, list) or not all(isinstance(s, str) for s in query_smis):
             raise TypeError("ref_smi must be a string and query_smis must be a list of strings")
 
