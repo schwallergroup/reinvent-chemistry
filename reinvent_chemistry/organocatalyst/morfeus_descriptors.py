@@ -24,8 +24,8 @@ class MorfeusDescriptors:
 
             return xtb.get_ip(corrected=True)
 
-        except FileNotFoundError:
-            return "error"
+        except Exception:
+            return 0.0
 
     def electron_affinity(self, mol: Mol) -> float:
         try:
@@ -36,8 +36,8 @@ class MorfeusDescriptors:
 
             return xtb.get_ea(corrected=True)
 
-        except FileNotFoundError:
-            return "error"
+        except Exception:
+            return 0.0
 
     def homo(self, mol: Mol) -> float:
         try:
@@ -48,8 +48,8 @@ class MorfeusDescriptors:
 
             return xtb.get_homo()
 
-        except FileNotFoundError:
-            return "error"
+        except Exception:
+            return 0.0
 
     def lumo(self, mol: Mol) -> float:
         try:
@@ -60,8 +60,8 @@ class MorfeusDescriptors:
 
             return xtb.get_lumo()
 
-        except FileNotFoundError:
-            return "error"
+        except Exception:
+            return 0.0
 
     def dipole(self, mol: Mol) -> float:
         try:
@@ -72,7 +72,7 @@ class MorfeusDescriptors:
             return xtb.get_ip(corrected=True)
 
         except Exception:
-            return "error"
+            return 0.0
 
     def electron_affinity(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -83,7 +83,7 @@ class MorfeusDescriptors:
             return xtb.get_ea(corrected=True)
 
         except Exception:
-            return "error"
+            return 0.0
 
     def homo(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -94,7 +94,7 @@ class MorfeusDescriptors:
             return xtb.get_homo()
 
         except Exception:
-            return "error"
+            return 0.0
 
     def lumo(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -105,7 +105,7 @@ class MorfeusDescriptors:
             return xtb.get_lumo()
 
         except Exception:
-            return "error"
+            return 0.0
 
     def dipole(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -117,8 +117,8 @@ class MorfeusDescriptors:
 
             return np.sqrt(np.array(dipoles).dot(np.array(dipoles).T))
 
-        except FileNotFoundError:
-            return "error"
+        except Exception:
+            return 0.0
 
     def global_electrophilicity(self, mol: Mol) -> float:
         try:
@@ -129,8 +129,8 @@ class MorfeusDescriptors:
 
             return xtb.get_global_descriptor("electrophilicity", corrected=True)
 
-        except FileNotFoundError:
-            return "error"
+        except Exception:
+            return 0.0
 
     def global_nucleophilicity(self, mol: Mol) -> float:
         try:
@@ -141,8 +141,8 @@ class MorfeusDescriptors:
 
             return xtb.get_global_descriptor("nucleophilicity", corrected=True)
 
-        except FileNotFoundError:
-            return "error"
+        except Exception:
+            return 0.0
 
     def global_electrophilicity(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -153,7 +153,7 @@ class MorfeusDescriptors:
             return xtb.get_global_descriptor("electrophilicity", corrected=True)
 
         except Exception:
-            return "error"
+            return 0.0
 
     def global_nucleophilicity(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -164,7 +164,7 @@ class MorfeusDescriptors:
             return xtb.get_global_descriptor("nucleophilicity", corrected=True)
 
         except Exception:
-            return "error"
+            return 0.0
 
     def chemical_potential(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -177,7 +177,7 @@ class MorfeusDescriptors:
             return (lumo_energy + homo_energy) / 2
 
         except Exception:
-            return "error"
+            return 0.0
 
     def hardness(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -190,7 +190,7 @@ class MorfeusDescriptors:
             return (lumo_energy - homo_energy) / 2
 
         except Exception:
-            return "error"
+            return 0.0
 
     def electrophilicity_index(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -205,7 +205,7 @@ class MorfeusDescriptors:
             return (math.pow(chemical_potential, 2)) / (2 * hardness)
 
         except Exception:
-            return "error"
+            return 0.0
 
     def nucleophilicity_index(self, mol: Mol) -> float:
         temp_dir, geometry_path = self._get_optimized_geometry_path(mol=mol)
@@ -221,7 +221,7 @@ class MorfeusDescriptors:
             return 1 / E_index
 
         except Exception:
-            return "error"
+            return 0.0
 
     def _get_optimized_geometry_path(self, mol: Mol):
         temp_dir = self._geometry_optimizer.optimize_xtb_geometry(mol=mol)
